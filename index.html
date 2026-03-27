@@ -1591,6 +1591,111 @@
     .a4 {
       animation: slideIn .6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
     }
+
+    /* ── TELEGRAM BUTTON ── */
+    .nbtn-tg {
+      background: #229ED9;
+      color: #fff;
+    }
+    .nbtn-tg:hover { opacity: 0.88; }
+
+    /* ── SETTINGS MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 2000;
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 32px;
+      width: 92%;
+      max-width: 460px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: slideIn .3s ease both;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .modal-field { margin-bottom: 16px; }
+    .modal-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border-medium);
+      border-radius: 8px;
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-input:focus { border-color: #229ED9; }
+    .modal-check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .modal-check-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #229ED9;
+      cursor: pointer;
+    }
+    .modal-check-label { font-size: 13px; color: var(--text-main); font-weight: 500; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .modal-btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-btn-cancel { background: var(--bg-app); color: var(--text-muted); border: 1.5px solid var(--border-medium); }
+    .modal-btn-save { background: #229ED9; color: #fff; }
+    .modal-btn-save:hover { opacity: 0.88; }
+    .tg-guide {
+      background: var(--bg-app);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.7;
+      border-left: 3px solid #229ED9;
+    }
+    .tg-guide strong { color: #229ED9; }
   </style>
 </head>
 
@@ -1652,6 +1757,13 @@
         </button>
         <button class="nbtn nbtn-s" onclick="window.print()">
           <i data-lucide="printer"></i> <span>Print</span>
+        </button>
+        <button class="nbtn nbtn-tg" onclick="sendToTelegram()" id="tgSendBtn" title="Generate PDF &amp; Send to Telegram">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          <span>Telegram</span>
+        </button>
+        <button class="nbtn nbtn-s" onclick="openTgSettings()" title="Telegram Settings" style="padding:8px 10px;">
+          <i data-lucide="settings-2"></i>
         </button>
       </div>
       <div class="nav-btns" id="dashboardBtns">
@@ -1859,6 +1971,39 @@
     <button class="install-banner-close" onclick="dismissBanner()">✕</button>
   </div>
 
+  <!-- TELEGRAM SETTINGS MODAL -->
+  <div class="modal-overlay" id="tgModal">
+    <div class="modal-box">
+      <div class="modal-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#229ED9"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Telegram Setup
+      </div>
+      <div class="modal-sub">Configure your Telegram Bot to receive production order PDF files directly in your chat.</div>
+      <div class="tg-guide">
+        <strong>Step 1:</strong> Open Telegram → Search <strong>@BotFather</strong> → /newbot → Copy the token<br>
+        <strong>Step 2:</strong> Search <strong>@userinfobot</strong> in Telegram → Start it → Copy your Chat ID<br>
+        <strong>Step 3:</strong> Paste both below and click Save
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Bot Token</div>
+        <input class="modal-input" id="tgBotToken" placeholder="123456789:ABCDefGhIJKlmNoPQRstuVWXyz...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Chat ID</div>
+        <input class="modal-input" id="tgChatId" placeholder="e.g. 987654321 or -100123456789">
+      </div>
+      <label class="modal-check-row">
+        <input type="checkbox" id="tgAutoSend">
+        <span class="modal-check-label">Auto-send PDF to Telegram whenever order is saved</span>
+      </label>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="closeTgSettings()">Cancel</button>
+        <button class="modal-btn" id="tgTestBtn" onclick="testTgConnection()" style="background:#0f766e;color:#fff;">Test Connection</button>
+        <button class="modal-btn modal-btn-save" onclick="saveTgSettings()">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ── SIDEBAR TOGGLE (MOBILE) ──
     function toggleSidebar() {
@@ -2032,6 +2177,13 @@
       orders[currentOrderId] = data;
       saveAllOrders(orders);
       if (!silent) showToast('Order Saved ✓');
+      // ── AUTO-SEND TO TELEGRAM ──
+      const tgCfg = getTgConfig();
+      if (tgCfg.autoSend && tgCfg.botToken && tgCfg.chatId) {
+        sendToTelegram(true).then(() => {
+          if (!silent) showToast('✅ Saved & Sent to Telegram!');
+        });
+      }
     }
 
     // ── AUTO-SAVE SYSTEM ──
@@ -2164,6 +2316,464 @@
       showToast('Excel Downloaded ✓');
     }
 
+    // ── TELEGRAM INTEGRATION ──
+    const TG_KEY = 'textilePro_tgConfig';
+
+    function getTgConfig() {
+      try { return JSON.parse(localStorage.getItem(TG_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function openTgSettings() {
+      const cfg = getTgConfig();
+      document.getElementById('tgBotToken').value = cfg.botToken || '';
+      document.getElementById('tgChatId').value   = cfg.chatId   || '';
+      document.getElementById('tgAutoSend').checked = !!cfg.autoSend;
+      document.getElementById('tgModal').classList.add('show');
+    }
+
+    function closeTgSettings() {
+      document.getElementById('tgModal').classList.remove('show');
+    }
+
+    function saveTgSettings() {
+      const token = document.getElementById('tgBotToken').value.trim();
+      const chatId = document.getElementById('tgChatId').value.trim();
+      const autoSend = document.getElementById('tgAutoSend').checked;
+      if (!token || !chatId) {
+        showToast('⚠️ Please enter both Bot Token and Chat ID', true);
+        return;
+      }
+      localStorage.setItem(TG_KEY, JSON.stringify({ botToken: token, chatId, autoSend }));
+      closeTgSettings();
+      showToast('✅ Telegram settings saved!');
+    }
+
+    async function testTgConnection() {
+      const token  = document.getElementById('tgBotToken').value.trim();
+      const chatId = document.getElementById('tgChatId').value.trim();
+      if (!token || !chatId) {
+        showToast('⚠️ Enter Token and Chat ID first', true);
+        return;
+      }
+      if (!token.includes(':')) {
+        showToast('❌ Token format wrong — should be  123456:ABC...', true);
+        return;
+      }
+      const btn = document.getElementById('tgTestBtn');
+      if (btn) { btn.textContent = 'Testing…'; btn.disabled = true; }
+      try {
+        const res  = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: '✅ Textile Pro connected successfully! Your Telegram is working.' })
+        });
+        const raw  = await res.text();
+        console.log('Test response:', raw);
+        const data = JSON.parse(raw);
+        if (data.ok) {
+          showToast('✅ Test message sent! Check Telegram.');
+        } else {
+          showToast(`❌ ${data.description}`, true);
+        }
+      } catch(e) {
+        showToast('❌ Network error during test.', true);
+      } finally {
+        if (btn) { btn.textContent = 'Test Connection'; btn.disabled = false; }
+      }
+    }
+
+    function buildTgMessage() {
+      const get = id => { const el = document.getElementById(id); return el ? el.value || '—' : '—'; };
+      const compName = get('compName');
+      const odsgn    = get('odsgn');
+      const ocolr    = get('ocolr');
+      const oqty     = get('oqty');
+      const wqty     = get('wqty');
+      const cons     = get('const');
+      const construction = get('construction');
+      const pickVal  = get('pickVal');
+      const widthVal = get('widthVal');
+      const ppm      = get('ppm');
+      const processLoss = get('processLoss');
+      const priceRS  = get('priceRS');
+      const washing  = get('notesWashing');
+      const status   = document.getElementById('currentStatus') ? document.getElementById('currentStatus').value : '—';
+      const now = new Date().toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+      // Collect non-empty table rows
+      const rows = [];
+      document.querySelectorAll('#tbody tr').forEach((tr, idx) => {
+        const inputs = tr.querySelectorAll('input');
+        const vals = Array.from(inputs).map(i => i.value.trim());
+        if (vals.some(v => v)) {
+          rows.push(`  Row ${idx+1}: OUT[${vals[0]||'-'} | ${vals[1]||'-'} pcs | ${vals[2]||'-'} mtr | DC:${vals[3]||'-'}] BILL[${vals[4]||'-'}|${vals[5]||'-'}|${vals[6]||'-'}] IN[${vals[7]||'-'} | ${vals[8]||'-'} mtr | ${vals[9]||'-'} pcs | DC:${vals[10]||'-'}]`);
+        }
+      });
+
+      const totalOut_pcs = document.getElementById('tp-out') ? document.getElementById('tp-out').textContent : '—';
+      const totalOut_mtr = document.getElementById('tm-out') ? document.getElementById('tm-out').textContent : '—';
+      const totalIn_mtr  = document.getElementById('tm-in')  ? document.getElementById('tm-in').textContent  : '—';
+      const totalIn_pcs  = document.getElementById('tp-in')  ? document.getElementById('tp-in').textContent  : '—';
+
+      let msg = `🏭 *Textile Pro — Production Order*\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `📌 *Status:* ${status}\n`;
+      msg += `🏢 *Company:* ${compName}\n`;
+      msg += `🎨 *Design No:* ${odsgn}\n`;
+      msg += `🎨 *Colour:* ${ocolr}\n`;
+      msg += `📦 *Order Qty:* ${oqty}\n`;
+      msg += `🧵 *Weaving Qty:* ${wqty}\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `📐 *Fabric Details*\n`;
+      msg += `  Count: ${cons} | Construction: ${construction}\n`;
+      msg += `  Pick: ${pickVal} | Width: ${widthVal}\n`;
+      msg += `  Weight/Mtr: ${ppm} | Process Loss: ${processLoss}\n`;
+      msg += `  Price R.S.: ${priceRS}\n`;
+      if (washing && washing !== '—') {
+        msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `🌊 *Washing Process:*\n${washing}\n`;
+      }
+      msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `📋 *Transaction Log*\n`;
+      if (rows.length > 0) {
+        msg += rows.join('\n') + '\n';
+        msg += `  📤 Total OUT → ${totalOut_pcs} pcs | ${totalOut_mtr} mtr\n`;
+        msg += `  📥 Total IN  → ${totalIn_pcs} pcs | ${totalIn_mtr} mtr\n`;
+      } else {
+        msg += `  (No transactions logged)\n`;
+      }
+      msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `🕐 Sent: ${now}`;
+      return msg;
+    }
+
+    // ── GENERATE PDF BLOB from the A4 area ──
+    function generatePdfBlob() {
+      // Pure jsPDF text layout — works from file:// with no CORS issues
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+      const get = id => { const el = document.getElementById(id); return el ? (el.value || '—') : '—'; };
+      const pW  = pdf.internal.pageSize.getWidth();   // 297mm
+      const pH  = pdf.internal.pageSize.getHeight();  // 210mm
+      const L   = 14;   // left margin
+      const R   = pW - 14; // right margin
+      let   y   = 14;   // current Y cursor
+
+      // ── helper: draw a filled rect header band ──
+      const band = (text, bg, fg, yy, h = 7) => {
+        pdf.setFillColor(...bg);
+        pdf.rect(L, yy, R - L, h, 'F');
+        pdf.setTextColor(...fg);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica','bold');
+        pdf.text(text, L + 3, yy + h - 1.8);
+        return yy + h;
+      };
+
+      // ── helper: horizontal rule ──
+      const rule = (yy, col = [200,200,200]) => {
+        pdf.setDrawColor(...col);
+        pdf.setLineWidth(0.3);
+        pdf.line(L, yy, R, yy);
+        return yy + 0.4;
+      };
+
+      // ── helper: key/value row ──
+      const kv = (label, value, x, yy, w = 60) => {
+        pdf.setFontSize(7);
+        pdf.setFont('helvetica','bold');
+        pdf.setTextColor(100,116,139);
+        pdf.text(label.toUpperCase(), x, yy);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica','bold');
+        pdf.setTextColor(15,23,42);
+        pdf.text(String(value).substring(0,38), x, yy + 4.5);
+      };
+
+      // ══ HEADER BAND ══
+      pdf.setFillColor(30, 58, 138);
+      pdf.rect(L, y, R - L, 14, 'F');
+      // Brand mark
+      pdf.setFillColor(245, 158, 11);
+      pdf.rect(L, y, 3, 14, 'F');
+      pdf.setTextColor(255,255,255);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica','bold');
+      pdf.text('TEXTILE PRO', L + 7, y + 9);
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica','normal');
+      pdf.setTextColor(148,163,184);
+      pdf.text('Production Order Sheet', L + 7, y + 13.2);
+      // Right side: Design badge
+      const dsn = get('odsgn');
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica','bold');
+      pdf.setTextColor(245,158,11);
+      pdf.text(dsn, R - 4, y + 8, { align: 'right' });
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica','normal');
+      pdf.setTextColor(148,163,184);
+      pdf.text(new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}), R - 4, y + 13, { align: 'right' });
+      y += 18;
+
+      // ══ ORDER DETAILS ══
+      y = band('ORDER DETAILS', [248,250,252], [30,58,138], y, 6);
+      y += 2;
+
+      const fields = [
+        ['Company',      get('compName'),     L],
+        ['Order Qty',    get('oqty'),          L + 70],
+        ['Colour',       get('ocolr'),         L + 130],
+        ['Weaving Qty',  get('wqty'),          L + 190],
+      ];
+      fields.forEach(([lbl, val, x]) => kv(lbl, val, x, y));
+      y += 10;
+      rule(y); y += 3;
+
+      const fields2 = [
+        ['Count',         get('const'),        L],
+        ['Construction',  get('construction'), L + 55],
+        ['Pick',          get('pickVal'),       L + 110],
+        ['Width',         get('widthVal'),      L + 150],
+        ['Wt/Mtr',        get('ppm'),           L + 195],
+        ['Process Loss',  get('processLoss'),  L + 230],
+        ['Price R.S.',    get('priceRS'),       L + 265 > R - 10 ? R - 32 : L + 265],
+      ];
+      fields2.forEach(([lbl, val, x]) => {
+        if (x + 28 <= R) kv(lbl, val, x, y, 30);
+      });
+      y += 12;
+
+      // ══ WASHING PROCESS ══
+      const washing = get('notesWashing');
+      if (washing && washing !== '—') {
+        rule(y, [30,58,138]); y += 2;
+        y = band('WASHING PROCESS', [239,246,255], [30,58,138], y, 6);
+        y += 2;
+        pdf.setFontSize(8.5);
+        pdf.setFont('helvetica','normal');
+        pdf.setTextColor(30,41,59);
+        const lines = pdf.splitTextToSize(washing, R - L - 4);
+        const maxLines = Math.min(lines.length, 4);
+        pdf.text(lines.slice(0, maxLines), L + 2, y + 4);
+        y += maxLines * 4.5 + 4;
+      }
+
+      // ══ TRANSACTION LOG ══
+      rule(y, [30,58,138]); y += 2;
+      y = band('TRANSACTION LOG', [248,250,252], [30,58,138], y, 6);
+      y += 3;
+
+      // Table header
+      const cols = [
+        { label: 'OUT Date',  x: L,      w: 24 },
+        { label: 'OUT Pcs',   x: L+24,   w: 18 },
+        { label: 'OUT Mtr',   x: L+42,   w: 20 },
+        { label: 'DC No (Out)',x: L+62,  w: 24 },
+        { label: 'Bill 1',    x: L+86,   w: 22 },
+        { label: 'Bill 2',    x: L+108,  w: 22 },
+        { label: 'Bill 3',    x: L+130,  w: 22 },
+        { label: 'IN Date',   x: L+158,  w: 24 },
+        { label: 'IN Mtr',    x: L+182,  w: 20 },
+        { label: 'IN Pcs',    x: L+202,  w: 20 },
+        { label: 'DC No (In)',x: L+222,  w: 24 },
+      ];
+
+      // Header row bg
+      pdf.setFillColor(241,245,249);
+      pdf.rect(L, y, R - L, 6, 'F');
+      pdf.setFontSize(6.5);
+      pdf.setFont('helvetica','bold');
+      pdf.setTextColor(71,85,105);
+      cols.forEach(c => pdf.text(c.label, c.x + 1, y + 4));
+      // Divider line between OUT and IN
+      pdf.setDrawColor(148,163,184);
+      pdf.setLineWidth(0.5);
+      pdf.line(L + 155, y, L + 155, y + 6);
+      y += 6;
+      rule(y); y += 1;
+
+      // Data rows
+      const rows = document.querySelectorAll('#tbody tr');
+      let dataRowCount = 0;
+      rows.forEach((tr, idx) => {
+        const inputs = tr.querySelectorAll('input');
+        const vals = Array.from(inputs).map(i => i.value.trim());
+        if (!vals.some(v => v)) return;
+        if (y > pH - 30) return; // stop if near page bottom
+
+        const bg = dataRowCount % 2 === 0 ? [255,255,255] : [250,250,250];
+        pdf.setFillColor(...bg);
+        pdf.rect(L, y, R - L, 6, 'F');
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica','normal');
+        pdf.setTextColor(15,23,42);
+        cols.forEach((c, ci) => {
+          const v = (vals[ci] || '').substring(0, 14);
+          pdf.text(v, c.x + 1, y + 4.2);
+        });
+        // Divider between OUT/IN
+        pdf.setDrawColor(203,213,225);
+        pdf.setLineWidth(0.3);
+        pdf.line(L + 155, y, L + 155, y + 6);
+        rule(y + 6, [226,232,240]);
+        y += 6;
+        dataRowCount++;
+      });
+
+      if (dataRowCount === 0) {
+        pdf.setFontSize(8);
+        pdf.setTextColor(148,163,184);
+        pdf.text('No transactions recorded', L + 4, y + 5);
+        y += 10;
+      } else {
+        // Totals row
+        y += 2;
+        const tpOut = document.getElementById('tp-out')?.textContent || '—';
+        const tmOut = document.getElementById('tm-out')?.textContent || '—';
+        const tmIn  = document.getElementById('tm-in')?.textContent  || '—';
+        const tpIn  = document.getElementById('tp-in')?.textContent  || '—';
+        pdf.setFillColor(239,246,255);
+        pdf.rect(L, y, R - L, 7, 'F');
+        pdf.setDrawColor(30,58,138);
+        pdf.setLineWidth(0.5);
+        pdf.line(L, y, R, y);
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica','bold');
+        pdf.setTextColor(30,58,138);
+        pdf.text('TOTALS', L + 1, y + 4.5);
+        pdf.text(tpOut, L + 25, y + 4.5);
+        pdf.text(tmOut, L + 43, y + 4.5);
+        pdf.text(tmIn,  L + 183, y + 4.5);
+        pdf.text(tpIn,  L + 203, y + 4.5);
+        y += 9;
+      }
+
+      // ══ FOOTER ══
+      const footerY = pH - 10;
+      rule(footerY, [226,232,240]);
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica','normal');
+      pdf.setTextColor(148,163,184);
+      pdf.text('Generated by Textile Pro  •  Production Order Management', L, footerY + 4);
+      pdf.text(`Sent via Telegram  •  ${new Date().toLocaleString('en-IN')}`, R, footerY + 4, { align: 'right' });
+
+      return pdf.output('blob');
+    }
+
+    // ── SEND PDF FILE to Telegram via sendDocument ──
+    async function sendToTelegram(silent = false) {
+      const cfg = getTgConfig();
+      if (!cfg.botToken || !cfg.chatId) {
+        if (!silent) {
+          openTgSettings();
+          showToast('⚙️ Please configure Telegram first', true);
+        }
+        return;
+      }
+
+      const token  = cfg.botToken.trim();
+      const chatId = String(cfg.chatId).trim();
+
+      // ── Quick token/chat validation ──
+      if (!token.includes(':')) {
+        showToast('❌ Bot Token looks wrong. Check ⚙️ settings.', true);
+        return;
+      }
+
+      const btn = document.getElementById('tgSendBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        const sp = btn.querySelector('span');
+        if (sp) sp.textContent = 'Sending…';
+      }
+
+      if (!silent) showToast('📄 Building PDF…');
+
+      try {
+        // 1. Generate PDF blob using pure jsPDF (no html2canvas — works from file://)
+        const pdfBlob = generatePdfBlob();
+        console.log('PDF blob size:', pdfBlob.size, 'bytes');
+
+        // 2. Filename
+        const dsn      = (document.getElementById('odsgn')?.value    || 'Order').replace(/[^a-zA-Z0-9_-]/g,'_');
+        const comp     = (document.getElementById('compName')?.value || '').replace(/[^a-zA-Z0-9]/g,'_').substring(0,20);
+        const dateStr  = new Date().toISOString().slice(0,10);
+        const fileName = `TextilePro_${dsn}_${comp}_${dateStr}.pdf`;
+
+        // 3. Plain-text caption (NO parse_mode — avoids Markdown 400 errors)
+        const get = id => { const el = document.getElementById(id); return el ? (el.value || '-') : '-'; };
+        const plainCaption = [
+          '🏭 Textile Pro — Production Order',
+          '──────────────────────',
+          `Company : ${get('compName')}`,
+          `Design  : ${get('odsgn')}`,
+          `Colour  : ${get('ocolr')}`,
+          `Qty     : ${get('oqty')}`,
+          `Weaving : ${get('wqty')}`,
+          `Count   : ${get('const')}`,
+          `Const.  : ${get('construction')}`,
+          `Pick    : ${get('pickVal')}`,
+          `Width   : ${get('widthVal')}`,
+          `Wt/Mtr  : ${get('ppm')}`,
+          `Loss    : ${get('processLoss')}`,
+          `Price   : Rs. ${get('priceRS')}`,
+          '──────────────────────',
+          `OUT Pcs : ${document.getElementById('tp-out')?.textContent || '-'}`,
+          `OUT Mtr : ${document.getElementById('tm-out')?.textContent || '-'}`,
+          `IN  Mtr : ${document.getElementById('tm-in')?.textContent  || '-'}`,
+          `IN  Pcs : ${document.getElementById('tp-in')?.textContent  || '-'}`,
+          '──────────────────────',
+          `Sent    : ${new Date().toLocaleString('en-IN')}`
+        ].join('\n').substring(0, 1024);
+
+        // 4. Build FormData — NO parse_mode field
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('document', new File([pdfBlob], fileName, { type: 'application/pdf' }));
+        formData.append('caption', plainCaption);
+
+        console.log('Sending to Telegram — chat_id:', chatId, 'file:', fileName);
+
+        const res = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const rawText = await res.text();
+        console.log('Telegram raw response:', rawText);
+
+        let data;
+        try { data = JSON.parse(rawText); }
+        catch(e) { data = { ok: false, description: rawText }; }
+
+        if (data.ok) {
+          if (!silent) showToast('✅ PDF sent to Telegram!');
+        } else {
+          const errMsg = data.description || 'Unknown error';
+          showToast(`❌ ${errMsg}`, true);
+          console.error('Telegram rejected:', data);
+        }
+
+      } catch (err) {
+        showToast('❌ Network error — check internet connection.', true);
+        console.error('sendToTelegram error:', err);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          const sp = btn.querySelector('span');
+          if (sp) sp.textContent = 'Telegram';
+        }
+      }
+    }
+
+    // ── PATCHED saveData — triggers auto-send if enabled ──
+    const _origSaveData = saveData;
+
     // ── BOOT: show dashboard ──
     renderDashboard();
     showPage('dashboard');
@@ -2204,7 +2814,10 @@
       categories: ["business", "productivity"]
     };
     const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+    // Only attach manifest when served over http/https — blob URLs cause warnings on file://
+    if (location.protocol !== 'file:') {
+      document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+    }
 
     // ── 3. SERVICE WORKER (full offline caching) ──
     const swCode = `
@@ -2248,7 +2861,7 @@
         );
       });
     `;
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       const swBlob = new Blob([swCode], { type: 'application/javascript' });
       navigator.serviceWorker.register(URL.createObjectURL(swBlob), { scope: './' })
         .then(() => console.log('✅ SW registered — offline ready'))
